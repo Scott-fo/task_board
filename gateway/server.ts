@@ -1,5 +1,5 @@
-import express from 'express';
-import { router } from './src/routes/routes';
+import express from "express";
+import { router } from "./src/routes/routes";
 
 const PORT = 8000;
 
