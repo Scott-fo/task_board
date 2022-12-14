@@ -8,6 +8,6 @@ const proto = grpc.loadPackageDefinition(
 ) as unknown as ProtoGrpcType;
 
 export const client = new proto.EmailService(
-  "localhost:50051",
+  "dns:///task_board_emails_1:50051",
   grpc.credentials.createInsecure()
 );

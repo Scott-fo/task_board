@@ -47,19 +47,9 @@ export const GetSubscriptions = (
         if (err) {
           callback({ name: err.name, message: err.message }, {});
         } else {
-          callback(null, { subscriptions: result.map(parseSubscription) });
+          callback(null, { subscriptions: result });
         }
       });
     }
   });
-};
-
-const parseSubscription = (subscription: {
-  firstname: string;
-  email: string;
-}): { firstName: string; email: string } => {
-  return {
-    firstName: subscription.firstname,
-    email: subscription.email,
-  };
 };

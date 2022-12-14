@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  email_subscription_db:
+    image: mysql:5.7
+    restart: always
+    env_file: ./.env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    ports:
+      - 3306:3306
+    volumes:
+      - "./emails/init.sql:/docker-entrypoint-initdb.d/1.sql"
+      - db-data:/var/lib/mysql
+  gateway:
+    build:
+      context: .
+      dockerfile: ./gateway/Dockerfile
+    image: gateway
+    ports:
+      - 8000:8000
+    stdin_open: true
+    tty: true
+  emails:
+    build:
+      context: .
+      dockerfile: ./emails/Dockerfile
+    image: emails-service
+    env_file: ./.env
+    ports:
+      - 50051:50051
+    depends_on:
+      - email_subscription_db
+    stdin_open: true
+    tty: true
+
+volumes:
+  db-data:

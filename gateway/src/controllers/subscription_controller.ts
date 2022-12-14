@@ -10,6 +10,7 @@ export const getSubscriptions = (_req: Request, res: Response) => {
     {} as GetSubscriptionsRequest,
     (err: any, response: GetSubscriptionsResponse) => {
       if (err) {
+        console.log(err);
         res.status(400).send("Failed to retrieve subscriptions");
       } else {
         res.send(response);

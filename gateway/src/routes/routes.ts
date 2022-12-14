@@ -6,6 +6,9 @@ import {
 } from "../controllers/subscription_controller";
 const router = express.Router();
 
+router.get("/", () => {
+  console.log("Accessed");
+});
 router.get("/subscriptions", getSubscriptions);
 router.post("/subscriptions/create", createSubscription);
 
