@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+message CreateSubscriptionRequest {
+  string email = 1;
+  string firstName = 2;
+}
+
+message CreateSubscriptionResponse {}
+
+message SubscriptionEntry {
+    string email = 1;
+    string firstName = 2;
+}
+
+message GetSubscriptionsRequest {}
+message GetSubscriptionsResponse { repeated SubscriptionEntry subscriptions = 1; }
+
+enum NotificationType {
+    NOTIFICATION_DEADLINE_PASSED = 0;
+    NOTIFICATION_TASK_COMPLETED = 1;
+}
+
+message NotifySubscribersRequest {
+    NotificationType type = 1;
+}
+
+message NotifySubscribersResponse {}
+
+service EmailService {
+    rpc CreateSubscription(CreateSubscriptionRequest) returns (CreateSubscriptionResponse) {}
+    rpc GetSubscriptions(GetSubscriptionsRequest) returns (GetSubscriptionsResponse) {}
+    rpc NotifySubscribers(NotifySubscribersRequest) returns (NotifySubscribersResponse) {}
+}
