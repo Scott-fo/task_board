@@ -4,14 +4,15 @@ import {
   createSubscription,
   getSubscriptions,
 } from "../controllers/subscription_controller";
+import { getTasks } from "../controllers/task_controller";
+
 const router = express.Router();
 
-router.get("/", () => {
-  console.log("Accessed");
-});
 router.get("/subscriptions", getSubscriptions);
 router.post("/subscriptions/create", createSubscription);
 
 router.post("/subscriptions/notification", NotifySubscribers);
+
+router.get("/tasks", getTasks);
 
 export { router };

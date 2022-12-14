@@ -2,11 +2,11 @@ import { CreateSubscriptionRequest } from "../../../protos/CreateSubscriptionReq
 import { CreateSubscriptionResponse } from "../../../protos/CreateSubscriptionResponse";
 import { GetSubscriptionsRequest } from "../../../protos/GetSubscriptionsRequest";
 import { GetSubscriptionsResponse } from "../../../protos/GetSubscriptionsResponse";
-import { client } from "./grpc_client";
+import { emailServiceClient } from "./grpc_client";
 import type { Request, Response } from "express";
 
 export const getSubscriptions = (_req: Request, res: Response) => {
-  client.getSubscriptions(
+  emailServiceClient.getSubscriptions(
     {} as GetSubscriptionsRequest,
     (err: any, response: GetSubscriptionsResponse) => {
       if (err) {
@@ -21,7 +21,7 @@ export const getSubscriptions = (_req: Request, res: Response) => {
 
 export const createSubscription = (req: Request, res: Response) => {
   const { email, firstName } = req.body;
-  client.createSubscription(
+  emailServiceClient.createSubscription(
     { email, firstName } as CreateSubscriptionRequest,
     (err: any, response: CreateSubscriptionResponse) => {
       if (err) {

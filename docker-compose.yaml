@@ -34,6 +34,28 @@ services:
       - email_subscription_db
     stdin_open: true
     tty: true
+  tasks_db:
+    image: mongo:5.0
+    env_file: ./.env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data_container:/data/db
+      - ./tasks/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+  tasks:
+    build:
+      context: .
+      dockerfile: ./tasks/Dockerfile
+    image: tasks-service
+    env_file: ./.env
+    environment:
+      MONGO_STRING: mongodb://root:pass@tasks_db:27017
+    depends_on:
+      - tasks_db
 
 volumes:
   db-data:
+  mongodb_data_container:

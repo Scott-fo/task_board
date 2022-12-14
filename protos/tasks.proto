@@ -1,0 +1,15 @@
+syntax = "proto3";
+option go_package = "tasks/protos";
+
+message GetTasksRequest {}
+
+message TaskEntry {
+    string name = 1;
+    string description = 2;
+}
+
+message GetTasksResponse { repeated TaskEntry tasks = 1; }
+
+service TaskService {
+    rpc GetTasks(GetTasksRequest) returns (GetTasksResponse) {}
+}

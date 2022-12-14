@@ -1,11 +1,11 @@
-import { client } from "./grpc_client";
+import { emailServiceClient } from "./grpc_client";
 import type { Request, Response } from "express";
 import { NotifySubscribersRequest } from "../../../protos/NotifySubscribersRequest";
 import { NotifySubscribersResponse } from "../../../protos/NotifySubscribersResponse";
 
 export const NotifySubscribers = (req: Request, res: Response) => {
   const { type } = req.body;
-  client.notifySubscribers(
+  emailServiceClient.notifySubscribers(
     { type } as NotifySubscribersRequest,
     (err: any, response: NotifySubscribersResponse) => {
       if (err) {
