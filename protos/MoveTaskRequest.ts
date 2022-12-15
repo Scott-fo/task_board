@@ -2,11 +2,11 @@
 
 
 export interface MoveTaskRequest {
-  'listId'?: (number);
+  'listId'?: (string);
   'tasks'?: (string)[];
 }
 
 export interface MoveTaskRequest__Output {
-  'listId': (number);
+  'listId': (string);
   'tasks': (string)[];
 }

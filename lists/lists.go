@@ -112,7 +112,7 @@ func (s *Server) UpdateList(ctx context.Context, in *pb.UpdateListRequest) (*pb.
 
 	collection := client.Database("lists").Collection("lists")
 	filter := bson.M{"id": in.Id}
-	update := bson.M{"$set": bson.M{"name": in.Name, "tasks": in.Tasks}}
+	update := bson.M{"$set": bson.M{"name": in.Name}}
 
 	collection.UpdateOne(context.TODO(), filter, update)
 

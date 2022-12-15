@@ -5,7 +5,7 @@ message TaskEntry {
     string id = 1;
     string name = 2;
     string description = 3;
-    int32 listId = 4;
+    string listId = 4;
     bool completed = 5;
     string unixTime = 6;
 }
@@ -20,7 +20,7 @@ message CreateTaskRequest {
     string id = 1;
     string name = 2;
     string description = 3;
-    int32 listId = 4;
+    string listId = 4;
     bool completed = 5;
     string unixTime = 6;
 }
@@ -30,7 +30,7 @@ message UpdateTaskRequest{
     string id = 1;
     string name = 2;
     string description = 3;
-    int32 listId = 4;
+    string listId = 4;
     bool completed = 5;
     string unixTime = 6;
 }
@@ -38,13 +38,13 @@ message UpdateTaskResponse {
     string id = 1;
     string name = 2;
     string description = 3;
-    int32 listId = 4;
+    string listId = 4;
     bool completed = 5;
     string unixTime = 6;
 }
 
 message MoveTaskRequest { 
-  int32 listId = 1;
+  string listId = 1;
   repeated string tasks = 2; 
 }
 message MoveTaskResponse {}

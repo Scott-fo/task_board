@@ -2,17 +2,28 @@ import { emailServiceClient } from "./grpc_client";
 import type { Request, Response } from "express";
 import { NotifySubscribersRequest } from "../../../protos/NotifySubscribersRequest";
 import { NotifySubscribersResponse } from "../../../protos/NotifySubscribersResponse";
+import { z } from "zod";
 
 export const NotifySubscribers = (req: Request, res: Response) => {
-  const { type } = req.body;
-  emailServiceClient.notifySubscribers(
-    { type } as NotifySubscribersRequest,
-    (err: any, response: NotifySubscribersResponse) => {
-      if (err) {
-        res.status(400).send("Failed to notify subscribers");
-      } else {
-        res.send("Notified subscribers!");
+  const notifySubscribersSchema = z
+    .object({
+      type: z.string(),
+    })
+    .required();
+
+  const result = notifySubscribersSchema.safeParse(req.body);
+  if (result.success === false) {
+    res.status(400).send("Input validation failed");
+  } else {
+    emailServiceClient.notifySubscribers(
+      result.data as NotifySubscribersRequest,
+      (err: Error, _response: NotifySubscribersResponse) => {
+        if (err) {
+          res.status(400).send("Failed to notify subscribers");
+        } else {
+          res.send("Notified subscribers!");
+        }
       }
-    }
-  );
+    );
+  }
 };

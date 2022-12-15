@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import { z } from "zod";
 import { CreateTaskRequest } from "../../../protos/CreateTaskRequest";
 import { CreateTaskResponse } from "../../../protos/CreateTaskResponse";
 import { DeleteTasksRequest } from "../../../protos/DeleteTasksRequest";
@@ -11,10 +12,10 @@ import { UpdateTaskRequest } from "../../../protos/UpdateTaskRequest";
 import { UpdateTaskResponse } from "../../../protos/UpdateTaskResponse";
 import { taskServiceClient } from "./grpc_client";
 
-export const getTasks = (req: Request, res: Response) => {
+export const getTasks = (_req: Request, res: Response) => {
   taskServiceClient.getTasks(
     {} as GetTasksRequest,
-    (err: any, response: GetTasksResponse) => {
+    (err: Error, response: GetTasksResponse) => {
       if (err) {
         console.log(err);
         res.status(400).send("Failed to retrieve tasks");
@@ -26,57 +27,107 @@ export const getTasks = (req: Request, res: Response) => {
 };
 
 export const createTask = (req: Request, res: Response) => {
-  taskServiceClient.createTask(
-    req.body as CreateTaskRequest,
-    (err: any, response: CreateTaskResponse) => {
-      if (err) {
-        console.log(err);
-        res.status(400).send("Failed to create task");
-      } else {
-        res.send(response);
+  const createTaskSchema = z.object({
+    name: z.string(),
+    description: z.string(),
+    listId: z.string(),
+    completed: z.boolean(),
+    unixTime: z.string(),
+  });
+
+  const result = createTaskSchema.safeParse(req.body);
+  if (result.success === false) {
+    res.status(400).send("Input validation failed");
+  } else {
+    taskServiceClient.createTask(
+      result.data as CreateTaskRequest,
+      (err: Error, response: CreateTaskResponse) => {
+        if (err) {
+          console.log(err);
+          res.status(400).send("Failed to create task");
+        } else {
+          res.send(response);
+        }
       }
-    }
-  );
+    );
+  }
 };
 
 export const deleteTasks = (req: Request, res: Response) => {
-  taskServiceClient.deleteTasks(
-    req.body as DeleteTasksRequest,
-    (err: any, response: DeleteTasksResponse) => {
-      if (err) {
-        console.log(err);
-        res.status(400).send("Failed to delete task");
-      } else {
-        res.send(response);
+  const deleteTaskSchema = z
+    .object({
+      id: z.string(),
+    })
+    .required();
+
+  const result = deleteTaskSchema.safeParse(req.body);
+  if (result.success === false) {
+    res.status(400).send("Input validation failed");
+  } else {
+    taskServiceClient.deleteTasks(
+      result.data as DeleteTasksRequest,
+      (err: Error, response: DeleteTasksResponse) => {
+        if (err) {
+          console.log(err);
+          res.status(400).send("Failed to delete task");
+        } else {
+          res.send(response);
+        }
       }
-    }
-  );
+    );
+  }
 };
 
 export const updateTask = (req: Request, res: Response) => {
-  taskServiceClient.updateTask(
-    req.body as UpdateTaskRequest,
-    (err: any, response: UpdateTaskResponse) => {
-      if (err) {
-        console.log(err);
-        res.status(400).send("Failed to update task");
-      } else {
-        res.send(response);
+  const updateTaskSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    description: z.string(),
+    listId: z.string(),
+    completed: z.boolean(),
+    unixTime: z.string(),
+  });
+
+  const result = updateTaskSchema.safeParse(req.body);
+  if (result.success === false || result.data.id === "") {
+    res.status(400).send("Input validation failed");
+  } else {
+    taskServiceClient.updateTask(
+      result.data as UpdateTaskRequest,
+      (err: Error, response: UpdateTaskResponse) => {
+        if (err) {
+          console.log(err);
+          res.status(400).send("Failed to update task");
+        } else {
+          res.send(response);
+        }
       }
-    }
-  );
+    );
+  }
 };
 
 export const moveTasks = (req: Request, res: Response) => {
-  taskServiceClient.moveTasks(
-    req.body as MoveTaskRequest,
-    (err: any, response: MoveTaskResponse) => {
-      if (err) {
-        console.log(err);
-        res.status(400).send("Failed to move tasks");
-      } else {
-        res.send(response);
+  const moveTaskSchema = z
+    .object({
+      listId: z.string(),
+      tasks: z.string().array(),
+    })
+    .required();
+
+  const result = moveTaskSchema.safeParse(req.body);
+  if (result.success === false) {
+    res.status(400).send("Input validation failed");
+  } else {
+    taskServiceClient.moveTasks(
+      result as MoveTaskRequest,
+      (err: Error, response: MoveTaskResponse) => {
+        if (err) {
+          console.log(err);
+          res.status(400).send("Failed to move tasks");
+        } else {
+          res.send(response);
+        }
       }
-    }
-  );
+    );
+  }
 };

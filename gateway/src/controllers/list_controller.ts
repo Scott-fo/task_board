@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import { z } from "zod";
 import { CreateListRequest } from "../../../protos/CreateListRequest";
 import { CreateListResponse } from "../../../protos/CreateListResponse";
 import { DeleteListRequest } from "../../../protos/DeleteListRequest";
@@ -9,10 +10,10 @@ import { UpdateListRequest } from "../../../protos/UpdateListRequest";
 import { UpdateListResponse } from "../../../protos/UpdateListResponse";
 import { listServiceClient } from "./grpc_client";
 
-export const getLists = (req: Request, res: Response) => {
+export const getLists = (_req: Request, res: Response) => {
   listServiceClient.getLists(
     {} as GetListsRequest,
-    (err: any, response: GetListsResponse) => {
+    (err: Error, response: GetListsResponse) => {
       if (err) {
         console.log(err);
         res.status(400).send("Failed to retrieve lists");
@@ -24,43 +25,77 @@ export const getLists = (req: Request, res: Response) => {
 };
 
 export const deleteLists = (req: Request, res: Response) => {
-  listServiceClient.deleteList(
-    req.body as DeleteListRequest,
-    (err: any, response: DeleteListResponse) => {
-      if (err) {
-        console.log(err);
-        res.status(400).send("Failed to delete list");
-      } else {
-        res.send(response);
+  const deleteListSchema = z
+    .object({
+      id: z.string(),
+    })
+    .required();
+
+  const result = deleteListSchema.safeParse(req.body);
+  if (result.success === false) {
+    res.status(400).send("Input validation failed");
+  } else {
+    listServiceClient.deleteList(
+      result.data as DeleteListRequest,
+      (err: Error, response: DeleteListResponse) => {
+        if (err) {
+          console.log(err);
+          res.status(400).send("Failed to delete list");
+        } else {
+          res.send(response);
+        }
       }
-    }
-  );
+    );
+  }
 };
 
 export const createLists = (req: Request, res: Response) => {
-  listServiceClient.createList(
-    req.body as CreateListRequest,
-    (err: any, response: CreateListResponse) => {
-      if (err) {
-        console.log(err);
-        res.status(400).send("Failed to create list");
-      } else {
-        res.send(response);
+  const createListSchema = z
+    .object({
+      name: z.string(),
+    })
+    .required();
+
+  const result = createListSchema.safeParse(req.body);
+  if (result.success === false) {
+    res.status(400).send("Input validation failed");
+  } else {
+    listServiceClient.createList(
+      result.data as CreateListRequest,
+      (err: Error, response: CreateListResponse) => {
+        if (err) {
+          console.log(err);
+          res.status(400).send("Failed to create list");
+        } else {
+          res.send(response);
+        }
       }
-    }
-  );
+    );
+  }
 };
 
 export const updateLists = (req: Request, res: Response) => {
-  listServiceClient.updateList(
-    req.body as UpdateListRequest,
-    (err: any, response: UpdateListResponse) => {
-      if (err) {
-        console.log(err);
-        res.status(400).send("Failed to update list");
-      } else {
-        res.send(response);
+  const updateListSchema = z
+    .object({
+      id: z.string(),
+      name: z.string(),
+    })
+    .required();
+
+  const result = updateListSchema.safeParse(req.body);
+  if (result.success === false) {
+    res.status(400).send("Input validation failed");
+  } else {
+    listServiceClient.updateList(
+      result.data as UpdateListRequest,
+      (err: Error, response: UpdateListResponse) => {
+        if (err) {
+          console.log(err);
+          res.status(400).send("Failed to update list");
+        } else {
+          res.send(response);
+        }
       }
-    }
-  );
+    );
+  }
 };
