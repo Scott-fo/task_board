@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  email_subscription_db:
+  emails_db:
     image: mysql:5.7
     restart: always
     env_file: ./.env
@@ -31,7 +31,7 @@ services:
     ports:
       - 50051:50051
     depends_on:
-      - email_subscription_db
+      - emails_db
     stdin_open: true
     tty: true
   tasks_db:
@@ -44,7 +44,7 @@ services:
       - 27017:27017
     volumes:
       - mongodb_tasks:/data/db
-      - ./tasks/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./tasks/internal/models/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
   tasks:
     build:
       context: .
@@ -65,7 +65,7 @@ services:
       - 28015:27017
     volumes:
       - mongodb_lists:/data/db
-      - ./lists/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./lists/internal/models/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
   lists:
     build:
       context: .

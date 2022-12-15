@@ -9,6 +9,6 @@ RUN go mod download
 
 COPY /tasks .
 
-RUN go build -o main .
+RUN go build ./cmd/tasks/main.go
 
 CMD ["./main"]

@@ -1,8 +1,8 @@
-import { emailServiceClient } from "./grpc_client";
 import type { Request, Response } from "express";
 import { NotifySubscribersRequest } from "../../../protos/NotifySubscribersRequest";
 import { NotifySubscribersResponse } from "../../../protos/NotifySubscribersResponse";
 import { z } from "zod";
+import { emailServiceClient } from "../grpc/email_service";
 
 export const NotifySubscribers = (req: Request, res: Response) => {
   const notifySubscribersSchema = z

@@ -8,7 +8,7 @@ import { GetListsRequest } from "../../../protos/GetListsRequest";
 import { GetListsResponse } from "../../../protos/GetListsResponse";
 import { UpdateListRequest } from "../../../protos/UpdateListRequest";
 import { UpdateListResponse } from "../../../protos/UpdateListResponse";
-import { listServiceClient } from "./grpc_client";
+import { listServiceClient } from "../grpc/list_service";
 
 export const getLists = (_req: Request, res: Response) => {
   listServiceClient.getLists(

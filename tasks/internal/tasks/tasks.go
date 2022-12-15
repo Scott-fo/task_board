@@ -1,48 +1,28 @@
-package main
+package tasks
 
 import (
 	"context"
 	"log"
-	"net"
-	"os"
+	"tasks/internal/models"
 	pb "tasks/protos"
 
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"google.golang.org/grpc"
 )
 
 type Server struct {
 	pb.UnimplementedTaskServiceServer
 }
 
-func main() {
-	listener, err := net.Listen("tcp", ":50052")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	s := grpc.NewServer()
-	pb.RegisterTaskServiceServer(s, &Server{})
-
-	log.Printf("Server listening on %v", listener.Addr())
-
-	if err := s.Serve(listener); err != nil {
-		log.Fatal(err)
-	}
-}
-
 func (s *Server) GetTasks(ctx context.Context, in *pb.GetTasksRequest) (*pb.GetTasksResponse, error) {
 	log.Printf("Received GetTasks request")
 
-	client, err := getMongoClient()
+	client, err := models.GetMongoClient()
 	if err != nil {
 		return &pb.GetTasksResponse{}, err
 	}
 
-	defer disconnectMongoClient(client)
+	defer models.DisconnectMongoClient(client)
 
 	collection := client.Database("tasks").Collection("tasks")
 
@@ -64,12 +44,12 @@ func (s *Server) GetTasks(ctx context.Context, in *pb.GetTasksRequest) (*pb.GetT
 func (s *Server) CreateTask(ctx context.Context, in *pb.CreateTaskRequest) (*pb.CreateTaskResponse, error) {
 	log.Printf("Received CreateTask request")
 
-	client, err := getMongoClient()
+	client, err := models.GetMongoClient()
 	if err != nil {
 		return &pb.CreateTaskResponse{}, err
 	}
 
-	defer disconnectMongoClient(client)
+	defer models.DisconnectMongoClient(client)
 
 	collection := client.Database("tasks").Collection("tasks")
 
@@ -86,12 +66,12 @@ func (s *Server) CreateTask(ctx context.Context, in *pb.CreateTaskRequest) (*pb.
 func (s *Server) DeleteTasks(ctx context.Context, in *pb.DeleteTasksRequest) (*pb.DeleteTasksResponse, error) {
 	log.Printf("Received DeleteTasks request")
 
-	client, err := getMongoClient()
+	client, err := models.GetMongoClient()
 	if err != nil {
 		return &pb.DeleteTasksResponse{}, err
 	}
 
-	defer disconnectMongoClient(client)
+	defer models.DisconnectMongoClient(client)
 
 	collection := client.Database("tasks").Collection("tasks")
 	filter := bson.M{"id": bson.M{"$in": in.Tasks}}
@@ -103,12 +83,12 @@ func (s *Server) DeleteTasks(ctx context.Context, in *pb.DeleteTasksRequest) (*p
 func (s *Server) UpdateTask(ctx context.Context, in *pb.UpdateTaskRequest) (*pb.UpdateTaskResponse, error) {
 	log.Printf("Received UpdateTask request")
 
-	client, err := getMongoClient()
+	client, err := models.GetMongoClient()
 	if err != nil {
 		return &pb.UpdateTaskResponse{}, err
 	}
 
-	defer disconnectMongoClient(client)
+	defer models.DisconnectMongoClient(client)
 
 	collection := client.Database("tasks").Collection("tasks")
 	filter := bson.M{"id": in.Id}
@@ -124,12 +104,12 @@ func (s *Server) UpdateTask(ctx context.Context, in *pb.UpdateTaskRequest) (*pb.
 func (s *Server) MoveTasks(ctx context.Context, in *pb.MoveTaskRequest) (*pb.MoveTaskResponse, error) {
 	log.Printf("Received DeleteTasks request")
 
-	client, err := getMongoClient()
+	client, err := models.GetMongoClient()
 	if err != nil {
 		return &pb.MoveTaskResponse{}, err
 	}
 
-	defer disconnectMongoClient(client)
+	defer models.DisconnectMongoClient(client)
 
 	collection := client.Database("tasks").Collection("tasks")
 	filter := bson.M{"id": bson.M{"$in": in.Tasks}}
@@ -137,21 +117,4 @@ func (s *Server) MoveTasks(ctx context.Context, in *pb.MoveTaskRequest) (*pb.Mov
 	collection.UpdateMany(context.TODO(), filter, update)
 
 	return &pb.MoveTaskResponse{}, nil
-}
-
-func getMongoClient() (*mongo.Client, error) {
-	connectionString := os.Getenv("MONGO_STRING")
-
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(connectionString))
-	if err != nil {
-		return nil, err
-	}
-
-	return client, nil
-}
-
-func disconnectMongoClient(client *mongo.Client) {
-	if err := client.Disconnect(context.TODO()); err != nil {
-		log.Fatal(err)
-	}
 }

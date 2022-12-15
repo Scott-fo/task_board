@@ -19,7 +19,7 @@ export const CreateSubscription = (
     if (err) {
       callback({ name: err.name, message: err.message }, {});
     } else {
-      connection.query("INSERT INTO subscriptions SET ?", user, (err, row) => {
+      connection.query("INSERT INTO subscriptions SET ?", user, (err, _row) => {
         connection.release();
         if (err) {
           callback({ name: err.name, message: err.message }, {});
@@ -32,7 +32,7 @@ export const CreateSubscription = (
 };
 
 export const GetSubscriptions = (
-  call: grpc.ServerUnaryCall<
+  _call: grpc.ServerUnaryCall<
     CreateSubscriptionRequest,
     CreateSubscriptionResponse
   >,

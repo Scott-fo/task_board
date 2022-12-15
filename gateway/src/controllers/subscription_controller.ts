@@ -2,9 +2,9 @@ import { CreateSubscriptionRequest } from "../../../protos/CreateSubscriptionReq
 import { CreateSubscriptionResponse } from "../../../protos/CreateSubscriptionResponse";
 import { GetSubscriptionsRequest } from "../../../protos/GetSubscriptionsRequest";
 import { GetSubscriptionsResponse } from "../../../protos/GetSubscriptionsResponse";
-import { emailServiceClient } from "./grpc_client";
 import type { Request, Response } from "express";
 import { z } from "zod";
+import { emailServiceClient } from "../grpc/email_service";
 
 export const getSubscriptions = (_req: Request, res: Response) => {
   emailServiceClient.getSubscriptions(

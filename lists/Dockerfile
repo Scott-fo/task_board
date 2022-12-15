@@ -9,6 +9,6 @@ RUN go mod download
 
 COPY /lists .
 
-RUN go build -o main .
+RUN go build ./cmd/lists/main.go
 
 CMD ["./main"]

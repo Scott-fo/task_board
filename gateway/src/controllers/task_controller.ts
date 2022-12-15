@@ -10,7 +10,7 @@ import { MoveTaskRequest } from "../../../protos/MoveTaskRequest";
 import { MoveTaskResponse } from "../../../protos/MoveTaskResponse";
 import { UpdateTaskRequest } from "../../../protos/UpdateTaskRequest";
 import { UpdateTaskResponse } from "../../../protos/UpdateTaskResponse";
-import { taskServiceClient } from "./grpc_client";
+import { taskServiceClient } from "../grpc/task_service";
 
 export const getTasks = (_req: Request, res: Response) => {
   taskServiceClient.getTasks(
@@ -56,7 +56,7 @@ export const createTask = (req: Request, res: Response) => {
 export const deleteTasks = (req: Request, res: Response) => {
   const deleteTaskSchema = z
     .object({
-      id: z.string(),
+      tasks: z.string().array(),
     })
     .required();
 

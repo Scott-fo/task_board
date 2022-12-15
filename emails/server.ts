@@ -14,7 +14,9 @@ const emailServer: EmailServiceHandlers = {
   NotifySubscribers: NotifySubscribers,
 };
 
-const packageDefinition = protoloader.loadSync("../protos/subscription.proto");
+const packageDefinition = protoloader.loadSync(
+  "../protos/source/subscription.proto"
+);
 const proto = grpc.loadPackageDefinition(
   packageDefinition
 ) as unknown as ProtoGrpcType;
