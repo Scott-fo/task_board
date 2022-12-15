@@ -1,0 +1,37 @@
+syntax = "proto3";
+option go_package = "lists/protos";
+
+message ListEntry {
+   string id = 1;
+   string name = 2;
+   repeated string tasks = 3;
+}
+message GetListsRequest {}
+message GetListsResponse { repeated ListEntry lists = 1; }
+
+message DeleteListRequest { string id = 1; }
+message DeleteListResponse {}
+
+message CreateListRequest {
+  string id = 1;
+  string name = 2; 
+}
+message CreateListResponse {}
+
+message UpdateListRequest {
+   string id = 1;
+   string name = 2;
+   repeated string tasks = 3;
+}
+message UpdateListResponse {
+   string id = 1;
+   string name = 2;
+   repeated string tasks = 3;
+}
+
+service ListService {
+    rpc GetLists(GetListsRequest) returns (GetListsResponse) {}
+    rpc DeleteList(DeleteListRequest) returns (DeleteListResponse) {}
+    rpc CreateList(CreateListRequest) returns (CreateListResponse) {}
+    rpc UpdateList(UpdateListRequest) returns (UpdateListResponse) {}
+}

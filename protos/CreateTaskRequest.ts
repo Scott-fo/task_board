@@ -1,7 +1,7 @@
 // Original file: protos/tasks.proto
 
 
-export interface TaskEntry {
+export interface CreateTaskRequest {
   'id'?: (string);
   'name'?: (string);
   'description'?: (string);
@@ -10,7 +10,7 @@ export interface TaskEntry {
   'unixTime'?: (string);
 }
 
-export interface TaskEntry__Output {
+export interface CreateTaskRequest__Output {
   'id': (string);
   'name': (string);
   'description': (string);

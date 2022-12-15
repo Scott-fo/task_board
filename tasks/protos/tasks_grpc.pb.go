@@ -23,6 +23,10 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TaskServiceClient interface {
 	GetTasks(ctx context.Context, in *GetTasksRequest, opts ...grpc.CallOption) (*GetTasksResponse, error)
+	DeleteTasks(ctx context.Context, in *DeleteTasksRequest, opts ...grpc.CallOption) (*DeleteTasksResponse, error)
+	CreateTask(ctx context.Context, in *CreateTaskRequest, opts ...grpc.CallOption) (*CreateTaskResponse, error)
+	UpdateTask(ctx context.Context, in *UpdateTaskRequest, opts ...grpc.CallOption) (*UpdateTaskResponse, error)
+	MoveTasks(ctx context.Context, in *MoveTaskRequest, opts ...grpc.CallOption) (*MoveTaskResponse, error)
 }
 
 type taskServiceClient struct {
@@ -42,11 +46,51 @@ func (c *taskServiceClient) GetTasks(ctx context.Context, in *GetTasksRequest, o
 	return out, nil
 }
 
+func (c *taskServiceClient) DeleteTasks(ctx context.Context, in *DeleteTasksRequest, opts ...grpc.CallOption) (*DeleteTasksResponse, error) {
+	out := new(DeleteTasksResponse)
+	err := c.cc.Invoke(ctx, "/TaskService/DeleteTasks", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskServiceClient) CreateTask(ctx context.Context, in *CreateTaskRequest, opts ...grpc.CallOption) (*CreateTaskResponse, error) {
+	out := new(CreateTaskResponse)
+	err := c.cc.Invoke(ctx, "/TaskService/CreateTask", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskServiceClient) UpdateTask(ctx context.Context, in *UpdateTaskRequest, opts ...grpc.CallOption) (*UpdateTaskResponse, error) {
+	out := new(UpdateTaskResponse)
+	err := c.cc.Invoke(ctx, "/TaskService/UpdateTask", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskServiceClient) MoveTasks(ctx context.Context, in *MoveTaskRequest, opts ...grpc.CallOption) (*MoveTaskResponse, error) {
+	out := new(MoveTaskResponse)
+	err := c.cc.Invoke(ctx, "/TaskService/MoveTasks", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TaskServiceServer is the server API for TaskService service.
 // All implementations must embed UnimplementedTaskServiceServer
 // for forward compatibility
 type TaskServiceServer interface {
 	GetTasks(context.Context, *GetTasksRequest) (*GetTasksResponse, error)
+	DeleteTasks(context.Context, *DeleteTasksRequest) (*DeleteTasksResponse, error)
+	CreateTask(context.Context, *CreateTaskRequest) (*CreateTaskResponse, error)
+	UpdateTask(context.Context, *UpdateTaskRequest) (*UpdateTaskResponse, error)
+	MoveTasks(context.Context, *MoveTaskRequest) (*MoveTaskResponse, error)
 	mustEmbedUnimplementedTaskServiceServer()
 }
 
@@ -56,6 +100,18 @@ type UnimplementedTaskServiceServer struct {
 
 func (UnimplementedTaskServiceServer) GetTasks(context.Context, *GetTasksRequest) (*GetTasksResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTasks not implemented")
+}
+func (UnimplementedTaskServiceServer) DeleteTasks(context.Context, *DeleteTasksRequest) (*DeleteTasksResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteTasks not implemented")
+}
+func (UnimplementedTaskServiceServer) CreateTask(context.Context, *CreateTaskRequest) (*CreateTaskResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateTask not implemented")
+}
+func (UnimplementedTaskServiceServer) UpdateTask(context.Context, *UpdateTaskRequest) (*UpdateTaskResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTask not implemented")
+}
+func (UnimplementedTaskServiceServer) MoveTasks(context.Context, *MoveTaskRequest) (*MoveTaskResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MoveTasks not implemented")
 }
 func (UnimplementedTaskServiceServer) mustEmbedUnimplementedTaskServiceServer() {}
 
@@ -88,6 +144,78 @@ func _TaskService_GetTasks_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TaskService_DeleteTasks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteTasksRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).DeleteTasks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/TaskService/DeleteTasks",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).DeleteTasks(ctx, req.(*DeleteTasksRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TaskService_CreateTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateTaskRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).CreateTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/TaskService/CreateTask",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).CreateTask(ctx, req.(*CreateTaskRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TaskService_UpdateTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTaskRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).UpdateTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/TaskService/UpdateTask",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).UpdateTask(ctx, req.(*UpdateTaskRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TaskService_MoveTasks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MoveTaskRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).MoveTasks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/TaskService/MoveTasks",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).MoveTasks(ctx, req.(*MoveTaskRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TaskService_ServiceDesc is the grpc.ServiceDesc for TaskService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -98,6 +226,22 @@ var TaskService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetTasks",
 			Handler:    _TaskService_GetTasks_Handler,
+		},
+		{
+			MethodName: "DeleteTasks",
+			Handler:    _TaskService_DeleteTasks_Handler,
+		},
+		{
+			MethodName: "CreateTask",
+			Handler:    _TaskService_CreateTask_Handler,
+		},
+		{
+			MethodName: "UpdateTask",
+			Handler:    _TaskService_UpdateTask_Handler,
+		},
+		{
+			MethodName: "MoveTasks",
+			Handler:    _TaskService_MoveTasks_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
