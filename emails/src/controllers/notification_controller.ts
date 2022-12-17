@@ -11,6 +11,7 @@ export const NotifySubscribers = (
   >,
   callback: grpc.sendUnaryData<NotifySubscribersResponse>
 ) => {
+  console.log("Received NotifySubscribers request");
   const type = call.request.type as NotificationType;
 
   pool.getConnection((err, connection) => {
@@ -25,10 +26,8 @@ export const NotifySubscribers = (
           const length = result.length;
           for (let i = 0; i < length; ++i) {
             console.log(
-              `${
-                type === 1 ? "Completed" : "Missed Deadline"
-              } notification for "${result[i].firstName} | sent to ${
-                result[i].email
+              `${type === 1 ? "Completed" : "Missed Deadline"
+              } notification for "${result[i].firstName} | sent to ${result[i].email
               }`
             );
           }

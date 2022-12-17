@@ -230,7 +230,12 @@ const Tasks = () => {
                 </button>
               </div>
               <span
-                className={`font-bold ${task.completed ? "line-through" : ""}`}
+                className={`font-bold ${task.completed ? "line-through" : ""} ${
+                  parsedTime !== "" &&
+                  parseInt(task.unixTime) < DateTime.now().toSeconds()
+                    ? "text-red-500"
+                    : ""
+                }`}
               >
                 {parsedTime}
               </span>

@@ -47,6 +47,7 @@ func deleteTasksByList(ctx context.Context, in *pb.DeleteTasksByListRequest) {
 	conn, err := grpc.Dial("dns:///task_board_tasks_1:50052", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Println(err)
+		return
 	}
 
 	defer conn.Close()
