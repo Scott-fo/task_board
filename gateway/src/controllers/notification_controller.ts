@@ -7,7 +7,10 @@ import { emailServiceClient } from "../grpc/email_service";
 export const NotifySubscribers = (req: Request, res: Response) => {
   const notifySubscribersSchema = z
     .object({
-      type: z.string(),
+      type: z.enum([
+        "NOTIFICATION_DEADLINE_PASSED",
+        "NOTIFICATION_TASK_COMPLETED",
+      ]),
     })
     .required();
 

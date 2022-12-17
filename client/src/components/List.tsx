@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
 import { setActiveList, updateLists } from "../features/lists/listSlice";
 
-interface ListInterface {
+export interface ListInterface {
   id: string;
   name: string;
 }

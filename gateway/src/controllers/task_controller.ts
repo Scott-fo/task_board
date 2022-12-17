@@ -146,7 +146,7 @@ export const moveTasks = (req: Request, res: Response) => {
     res.status(400).send("Input validation failed");
   } else {
     taskServiceClient.moveTasks(
-      result as MoveTaskRequest,
+      result.data as MoveTaskRequest,
       (err: Error, response: MoveTaskResponse) => {
         if (err) {
           console.log(err);

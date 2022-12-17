@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import z from "zod";
 import axios from "axios";
 import { useAppSelector } from "../app/hooks";
 import { TaskFooter } from "./TaskFooter";
@@ -13,14 +14,19 @@ export interface Task {
   completed?: boolean;
 }
 
+interface EditingTask extends Task {
+  parsedTime: string;
+}
+
 const Tasks = () => {
+  const [open, setOpen] = React.useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [editing, setEditing] = useState<{ id: string; state: boolean }>({
     id: "",
     state: false,
   });
   const [selected, setSelected] = useState<string[]>([]);
-  const [editingState, setEditingState] = useState<Task>();
+  const [editingState, setEditingState] = useState<EditingTask>();
 
   const listId = useAppSelector((state) => state.listReducer.id);
 
@@ -30,16 +36,18 @@ const Tasks = () => {
   };
 
   useEffect(() => {
-    getTasks();
-    setSelected([]);
-  }, [listId]);
+    if (open !== true) {
+      getTasks();
+      setSelected([]);
+    }
+  }, [listId, open]);
 
   const newTask: Partial<Task> = {
     name: "Untitled Task",
     description: "description",
     listId,
     completed: false,
-    unixTime: "1",
+    unixTime: "",
   };
 
   const deleteTasks = async () => {
@@ -65,35 +73,69 @@ const Tasks = () => {
     }
   };
 
-  const handleEditing = (id: string, state: boolean, task: Task) => {
-    setEditing({ id, state });
+  const handleEditing = (task: Task, state: boolean) => {
+    setEditing({ id: task.id, state });
+    setSelected(selected.filter((entry) => entry !== task.id));
     setEditingState({
-      id,
-      name: task.name,
-      description: task.description,
-      listId: task.listId,
+      ...task,
       completed: task.completed ?? false,
-      unixTime: task.unixTime,
-    } as Task);
+      parsedTime:
+        task.unixTime && task.unixTime !== ""
+          ? DateTime.fromSeconds(parseInt(task.unixTime)).toLocaleString()
+          : "",
+    } as EditingTask);
   };
 
-  const updateTask = async ({
-    id,
-    name,
-    description,
-    listId,
-    unixTime,
-    completed,
-  }: Task) => {
-    setEditing({ id, state: false });
+  const validateDateInput = (): { deadline: string; error: string } => {
+    if (editingState?.parsedTime !== "") {
+      const dateSchema = z.preprocess((arg) => {
+        if (typeof arg == "string" || arg instanceof Date) return new Date(arg);
+      }, z.date());
+
+      const result = dateSchema.safeParse(
+        DateTime.fromFormat(editingState!.parsedTime, "dd/MM/yyyy").toJSDate()
+      );
+      if (result.success === false) {
+        return { deadline: "", error: "Enter valid date" };
+      } else {
+        const deadline = DateTime.fromJSDate(result.data).toSeconds();
+        if (deadline < DateTime.now().toSeconds()) {
+          return { deadline: "", error: "Please enter a date in the future" };
+        } else {
+          return { deadline: deadline.toString(), error: "" };
+        }
+      }
+    } else {
+      return { deadline: "", error: "" };
+    }
+  };
+
+  const updateTask = async (task: Task) => {
+    const { deadline, error } = validateDateInput();
+    if (error !== "") {
+      console.log(error);
+    } else {
+      await axios.post("http://localhost:8000/tasks/update", {
+        ...task,
+        unixTime: deadline,
+      });
+      getTasks();
+      setEditing({ id: task.id, state: false });
+    }
+  };
+
+  const completeTask = async (task: Task) => {
+    const status = !task.completed;
     await axios.post("http://localhost:8000/tasks/update", {
-      id,
-      name,
-      listId,
-      description,
-      unixTime,
-      completed,
+      ...task,
+      completed: status,
     });
+
+    if (status === true) {
+      await axios.post("http://localhost:8000/subscriptions/notification", {
+        type: "NOTIFICATION_TASK_COMPLETED",
+      });
+    }
     getTasks();
   };
 
@@ -120,45 +162,82 @@ const Tasks = () => {
                       setEditingState({
                         ...editingState,
                         name: e.target.value,
-                      } as Task)
+                      } as EditingTask)
                     }
                   />
                 </div>
-                <input className="font-bold text-right" value={parsedTime} />
+                <input
+                  className="font-bold text-right"
+                  value={editingState?.parsedTime}
+                  onChange={(e) =>
+                    setEditingState({
+                      ...editingState,
+                      parsedTime: e.target.value,
+                    } as EditingTask)
+                  }
+                  placeholder={"dd/mm/yyyy"}
+                />
               </div>
-              <input
+              <textarea
+                className="w-full"
                 onChange={(e) =>
                   setEditingState({
                     ...editingState,
                     description: e.target.value,
-                  } as Task)
+                  } as EditingTask)
                 }
                 value={editingState?.description}
               />
             </div>
-            <button
-              className="pl-8 pr-8 pt-4 pb-4 border border-black rounded-lg hover:bg-red-500 hover:text-white m-2 w-full"
-              onClick={() => updateTask({ ...editingState } as Task)}
-            >
-              SAVE
-            </button>
+            <div className="flex">
+              <button
+                className="pl-8 pr-8 pt-4 pb-4 border border-black rounded-lg hover:bg-red-500 hover:text-white m-2 w-full"
+                onClick={() => updateTask(editingState as Task)}
+              >
+                SAVE
+              </button>
+              <button
+                className="pl-8 pr-8 pt-4 pb-4 border border-black rounded-lg hover:bg-red-500 hover:text-white m-2 w-full"
+                onClick={() => setEditing({ id: task.id, state: false })}
+              >
+                CANCEL
+              </button>
+            </div>
           </div>
         ) : (
           <div>
             <div className="flex justify-between">
               <div className="flex">
                 <input type="checkbox" onChange={() => toggleTask(task.id)} />
-                <span className="pl-4 font-bold">{task.name}</span>
+                <span
+                  className={`pl-4 font-bold ${
+                    task.completed ? "line-through" : ""
+                  }`}
+                >
+                  {task.name}
+                </span>
                 <button
-                  onClick={() => handleEditing(task.id, true, task)}
+                  onClick={() => handleEditing(task, true)}
                   className="pl-2 text-sm italic hover:underline"
                 >
                   Edit
                 </button>
+                <button
+                  onClick={() => completeTask(task)}
+                  className="pl-2 text-sm italic hover:underline"
+                >
+                  {task.completed ? "Undo Complete" : "Complete"}
+                </button>
               </div>
-              <span className="font-bold">{parsedTime}</span>
+              <span
+                className={`font-bold ${task.completed ? "line-through" : ""}`}
+              >
+                {parsedTime}
+              </span>
             </div>
-            <span>{task.description}</span>
+            <span className={`${task.completed ? "line-through" : ""}`}>
+              {task.description}
+            </span>
           </div>
         )}
       </div>
@@ -171,7 +250,13 @@ const Tasks = () => {
     <div className="h-[90%] overflow-auto">
       <div className="">{parsedTasks}</div>
       <div>
-        <TaskFooter createNewTask={createNewTask} deleteTasks={deleteTasks} />
+        <TaskFooter
+          selected={selected}
+          open={open}
+          setOpen={setOpen}
+          createNewTask={createNewTask}
+          deleteTasks={deleteTasks}
+        />
       </div>
     </div>
   );

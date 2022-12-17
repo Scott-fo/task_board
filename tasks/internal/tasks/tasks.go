@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"tasks/internal/models"
 	pb "tasks/protos/source"
@@ -150,7 +151,8 @@ func (s *Server) UpdateTask(ctx context.Context, in *pb.UpdateTaskRequest) (*pb.
 }
 
 func (s *Server) MoveTasks(ctx context.Context, in *pb.MoveTaskRequest) (*pb.MoveTaskResponse, error) {
-	log.Printf("Received DeleteTasks request")
+	log.Printf("Received MoveTasks request")
+	fmt.Println(in)
 
 	client, err := models.GetMongoClient()
 	if err != nil {

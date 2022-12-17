@@ -25,10 +25,10 @@ export const NotifySubscribers = (
           const length = result.length;
           for (let i = 0; i < length; ++i) {
             console.log(
-              `${type === NotificationType.NOTIFICATION_TASK_COMPLETED
-                ? "Completed"
-                : "Missed Deadline"
-              } notification for "${result[i].firstName} | sent to ${result[i].email
+              `${
+                type === 1 ? "Completed" : "Missed Deadline"
+              } notification for "${result[i].firstName} | sent to ${
+                result[i].email
               }`
             );
           }

@@ -1,7 +1,6 @@
 import React from "react";
 import { ActiveList } from "./components/ActiveList";
 import { List } from "./components/List";
-import { TaskFooter } from "./components/TaskFooter";
 import { Tasks } from "./components/Tasks";
 
 const App = () => {
