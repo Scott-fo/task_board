@@ -76,6 +76,15 @@ services:
       MONGO_STRING: mongodb://root:pass@lists_db:27017
     depends_on:
       - lists_db
+  client:
+    build:
+      context: .
+      dockerfile: ./client/Dockerfile
+    image: client-container
+    ports:
+      - 3000:3000
+    stdin_open: true
+    tty: true
 
 volumes:
   db-data:
