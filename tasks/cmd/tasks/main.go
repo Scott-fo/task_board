@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net"
+	cron "tasks/internal/jobHandler"
 	"tasks/internal/tasks"
 	pb "tasks/protos/source"
 
@@ -11,6 +12,10 @@ import (
 
 type Server struct {
 	pb.UnimplementedTaskServiceServer
+}
+
+func init() {
+	cron.Start()
 }
 
 func main() {
