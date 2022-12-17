@@ -1,12 +1,49 @@
-import React from "react";
+import React, { useEffect } from "react";
 import axios from "axios";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
-import { setListView, updateLists } from "../features/lists/listSlice";
+import {
+  setListView,
+  updateLists,
+  setActiveList,
+} from "../features/lists/listSlice";
+
+interface ListInterface {
+  id: string;
+  name: string;
+}
 
 const ActiveList = () => {
   const listName = useAppSelector((state) => state.listReducer.name);
+  const lists = useAppSelector((state) => state.listReducer.lists);
   const listId = useAppSelector((state) => state.listReducer.id);
   const dispatch = useAppDispatch();
+
+  const checkIfActiveListStillExists = () => {
+    if (lists.length > 0) {
+      const filteredData = lists.filter(
+        (entry: ListInterface) => entry.id === listId
+      );
+      if (filteredData.length === 0) {
+        dispatch(
+          setActiveList({
+            id: lists[0].id,
+            name: lists[0].name,
+          })
+        );
+      }
+    } else {
+      dispatch(
+        setActiveList({
+          id: "",
+          name: "No List Selected",
+        })
+      );
+    }
+  };
+
+  useEffect(() => {
+    checkIfActiveListStillExists();
+  }, [lists]);
 
   const editList = (value: string) => {
     dispatch(setListView(String(value)));
