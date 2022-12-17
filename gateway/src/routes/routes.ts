@@ -6,6 +6,7 @@ import {
 } from "../controllers/subscription_controller";
 import {
   getTasks,
+  getTasksByList,
   createTask,
   deleteTasks,
   updateTask,
@@ -26,6 +27,7 @@ router.post("/subscriptions/create", createSubscription);
 router.post("/subscriptions/notification", NotifySubscribers);
 
 router.get("/tasks", getTasks);
+router.get("/tasks/:id", getTasksByList);
 router.post("/tasks/create", createTask);
 router.post("/tasks/delete", deleteTasks);
 router.post("/tasks/update", updateTask);

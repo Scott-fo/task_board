@@ -4,7 +4,7 @@ import (
 	"log"
 	"net"
 	"tasks/internal/tasks"
-	pb "tasks/protos"
+	pb "tasks/protos/source"
 
 	"google.golang.org/grpc"
 )

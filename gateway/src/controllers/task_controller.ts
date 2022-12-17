@@ -6,6 +6,8 @@ import { DeleteTasksRequest } from "../../../protos/DeleteTasksRequest";
 import { DeleteTasksResponse } from "../../../protos/DeleteTasksResponse";
 import { GetTasksRequest } from "../../../protos/GetTasksRequest";
 import { GetTasksResponse } from "../../../protos/GetTasksResponse";
+import { GetTasksByListRequest } from "../../../protos/GetTasksByListRequest";
+import { GetTasksByListResponse } from "../../../protos/GetTasksByListResponse";
 import { MoveTaskRequest } from "../../../protos/MoveTaskRequest";
 import { MoveTaskResponse } from "../../../protos/MoveTaskResponse";
 import { UpdateTaskRequest } from "../../../protos/UpdateTaskRequest";
@@ -24,6 +26,31 @@ export const getTasks = (_req: Request, res: Response) => {
       }
     }
   );
+};
+
+export const getTasksByList = (req: Request, res: Response) => {
+  const getTasksByListSchema = z
+    .object({
+      id: z.string(),
+    })
+    .required();
+
+  const result = getTasksByListSchema.safeParse(req.params);
+  if (result.success === false) {
+    res.status(400).send("Input validation failed");
+  } else {
+    taskServiceClient.getTasksByList(
+      result.data as GetTasksByListRequest,
+      (err: Error, response: GetTasksByListResponse) => {
+        if (err) {
+          console.log(err);
+          res.status(400).send("Failed to retrieve tasks");
+        } else {
+          res.send(response);
+        }
+      }
+    );
+  }
 };
 
 export const createTask = (req: Request, res: Response) => {

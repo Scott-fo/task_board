@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.6.1
-// source: protos/lists.proto
+// source: protos/source/lists.proto
 
-package protos
+package source
 
 import (
 	context "context"
@@ -209,5 +209,5 @@ var ListService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "protos/lists.proto",
+	Metadata: "protos/source/lists.proto",
 }

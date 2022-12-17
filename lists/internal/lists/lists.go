@@ -3,11 +3,13 @@ package lists
 import (
 	"context"
 	"lists/internal/models"
-	pb "lists/protos"
+	pb "lists/protos/source"
 	"log"
 
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type Server struct {
@@ -41,6 +43,22 @@ func (s *Server) GetLists(ctx context.Context, in *pb.GetListsRequest) (*pb.GetL
 	}, nil
 }
 
+func deleteTasksByList(ctx context.Context, in *pb.DeleteTasksByListRequest) {
+	conn, err := grpc.Dial("dns:///task_board_tasks_1:50052", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Println(err)
+	}
+
+	defer conn.Close()
+	client := pb.NewTaskServiceClient(conn)
+
+	_, err = client.DeleteTasksByList(ctx, in)
+	if err != nil {
+		log.Print(err)
+		log.Println("Failed to delete tasks")
+	}
+}
+
 func (s *Server) DeleteList(ctx context.Context, in *pb.DeleteListRequest) (*pb.DeleteListResponse, error) {
 	log.Printf("Received DeleteLists request")
 
@@ -54,6 +72,8 @@ func (s *Server) DeleteList(ctx context.Context, in *pb.DeleteListRequest) (*pb.
 	collection := client.Database("lists").Collection("lists")
 	filter := bson.M{"id": in.Id}
 	collection.DeleteOne(context.TODO(), filter)
+
+	deleteTasksByList(ctx, &pb.DeleteTasksByListRequest{ListId: in.Id})
 
 	return &pb.DeleteListResponse{}, nil
 }
@@ -72,7 +92,7 @@ func (s *Server) CreateList(ctx context.Context, in *pb.CreateListRequest) (*pb.
 
 	in.Id = uuid.NewString()
 
-	_, err = collection.InsertOne(context.TODO(), in)
+	_, err = collection.InsertOne(context.TODO(), bson.M{"id": in.Id, "name": in.Name})
 	if err != nil {
 		return &pb.CreateListResponse{}, err
 	}

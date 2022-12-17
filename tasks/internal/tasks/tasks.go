@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 	"tasks/internal/models"
-	pb "tasks/protos"
+	pb "tasks/protos/source"
 
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
@@ -41,6 +41,33 @@ func (s *Server) GetTasks(ctx context.Context, in *pb.GetTasksRequest) (*pb.GetT
 	}, nil
 }
 
+func (s *Server) GetTasksByList(ctx context.Context, in *pb.GetTasksByListRequest) (*pb.GetTasksByListResponse, error) {
+	log.Printf("Received GetTasksByList request")
+
+	client, err := models.GetMongoClient()
+	if err != nil {
+		return &pb.GetTasksByListResponse{}, err
+	}
+
+	defer models.DisconnectMongoClient(client)
+
+	collection := client.Database("tasks").Collection("tasks")
+
+	cursor, err := collection.Find(context.TODO(), bson.M{"listId": in.Id})
+	if err != nil {
+		return &pb.GetTasksByListResponse{}, err
+	}
+
+	var results []*pb.TaskEntry
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		return &pb.GetTasksByListResponse{}, err
+	}
+
+	return &pb.GetTasksByListResponse{
+		Tasks: results,
+	}, nil
+}
+
 func (s *Server) CreateTask(ctx context.Context, in *pb.CreateTaskRequest) (*pb.CreateTaskResponse, error) {
 	log.Printf("Received CreateTask request")
 
@@ -55,12 +82,16 @@ func (s *Server) CreateTask(ctx context.Context, in *pb.CreateTaskRequest) (*pb.
 
 	in.Id = uuid.NewString()
 
-	_, err = collection.InsertOne(context.TODO(), in)
+	_, err = collection.InsertOne(context.TODO(), bson.M{"id": in.Id, "name": in.Name, "description": in.Description, "listId": in.ListId, "completed": in.Completed, "unixTime": in.UnixTime})
 	if err != nil {
 		return &pb.CreateTaskResponse{}, err
 	}
 
-	return &pb.CreateTaskResponse{}, nil
+	var result *pb.CreateTaskResponse
+	filter := bson.M{"id": in.Id}
+
+	collection.FindOne(context.TODO(), filter).Decode(&result)
+	return result, nil
 }
 
 func (s *Server) DeleteTasks(ctx context.Context, in *pb.DeleteTasksRequest) (*pb.DeleteTasksResponse, error) {
@@ -78,6 +109,23 @@ func (s *Server) DeleteTasks(ctx context.Context, in *pb.DeleteTasksRequest) (*p
 	collection.DeleteMany(context.TODO(), filter)
 
 	return &pb.DeleteTasksResponse{}, nil
+}
+
+func (s *Server) DeleteTasksByList(ctx context.Context, in *pb.DeleteTasksByListRequest) (*pb.DeleteTasksByListResponse, error) {
+	log.Printf("Received DeleteTasksByList request")
+
+	client, err := models.GetMongoClient()
+	if err != nil {
+		return &pb.DeleteTasksByListResponse{}, err
+	}
+
+	defer models.DisconnectMongoClient(client)
+
+	collection := client.Database("tasks").Collection("tasks")
+	filter := bson.D{{"listId", in.ListId}}
+	collection.DeleteMany(context.TODO(), filter)
+
+	return &pb.DeleteTasksByListResponse{}, nil
 }
 
 func (s *Server) UpdateTask(ctx context.Context, in *pb.UpdateTaskRequest) (*pb.UpdateTaskResponse, error) {

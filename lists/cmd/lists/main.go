@@ -2,7 +2,7 @@ package main
 
 import (
 	"lists/internal/lists"
-	pb "lists/protos"
+	pb "lists/protos/source"
 	"log"
 	"net"
 
