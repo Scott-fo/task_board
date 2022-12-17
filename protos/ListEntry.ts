@@ -1,4 +1,4 @@
-// Original file: protos/lists.proto
+// Original file: protos/source/lists.proto
 
 
 export interface ListEntry {

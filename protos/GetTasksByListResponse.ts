@@ -2,10 +2,10 @@
 
 import type { TaskEntry as _TaskEntry, TaskEntry__Output as _TaskEntry__Output } from './TaskEntry';
 
-export interface GetTasksResponse {
+export interface GetTasksByListResponse {
   'tasks'?: (_TaskEntry)[];
 }
 
-export interface GetTasksResponse__Output {
+export interface GetTasksByListResponse__Output {
   'tasks': (_TaskEntry__Output)[];
 }

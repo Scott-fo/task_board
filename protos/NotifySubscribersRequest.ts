@@ -1,4 +1,4 @@
-// Original file: protos/subscription.proto
+// Original file: protos/source/subscription.proto
 
 import type { NotificationType as _NotificationType, NotificationType__Output as _NotificationType__Output } from './NotificationType';
 

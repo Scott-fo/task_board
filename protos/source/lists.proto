@@ -1,5 +1,5 @@
 syntax = "proto3";
-option go_package = "lists/protos";
+option go_package = "lists/protos/source";
 
 message ListEntry {
    string id = 1;

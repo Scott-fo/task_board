@@ -1,5 +1,5 @@
 syntax = "proto3";
-option go_package = "tasks/protos";
+option go_package = "tasks/protos/source";
 
 message TaskEntry {
     string id = 1;
@@ -13,8 +13,14 @@ message TaskEntry {
 message GetTasksRequest {}
 message GetTasksResponse { repeated TaskEntry tasks = 1; }
 
+message GetTasksByListRequest { string id = 1;}
+message GetTasksByListResponse { repeated TaskEntry tasks = 1; }
+
 message DeleteTasksRequest { repeated string tasks = 1; }
 message DeleteTasksResponse {}
+
+message DeleteTasksByListRequest { string listId = 1; }
+message DeleteTasksByListResponse {}
 
 message CreateTaskRequest {
     string id = 1;
@@ -24,7 +30,14 @@ message CreateTaskRequest {
     bool completed = 5;
     string unixTime = 6;
 }
-message CreateTaskResponse {}
+message CreateTaskResponse {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    string listId = 4;
+    bool completed = 5;
+    string unixTime = 6;
+  }
 
 message UpdateTaskRequest{
     string id = 1;
@@ -51,7 +64,9 @@ message MoveTaskResponse {}
 
 service TaskService {
     rpc GetTasks(GetTasksRequest) returns (GetTasksResponse) {}
+    rpc GetTasksByList(GetTasksByListRequest) returns (GetTasksByListResponse) {}
     rpc DeleteTasks(DeleteTasksRequest) returns (DeleteTasksResponse) {}
+    rpc DeleteTasksByList(DeleteTasksByListRequest) returns (DeleteTasksByListResponse) {}
     rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse) {}
     rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse) {}
     rpc MoveTasks(MoveTaskRequest) returns (MoveTaskResponse) {}

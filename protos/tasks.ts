@@ -10,8 +10,12 @@ type SubtypeConstructor<Constructor extends new (...args: any) => any, Subtype> 
 export interface ProtoGrpcType {
   CreateTaskRequest: MessageTypeDefinition
   CreateTaskResponse: MessageTypeDefinition
+  DeleteTasksByListRequest: MessageTypeDefinition
+  DeleteTasksByListResponse: MessageTypeDefinition
   DeleteTasksRequest: MessageTypeDefinition
   DeleteTasksResponse: MessageTypeDefinition
+  GetTasksByListRequest: MessageTypeDefinition
+  GetTasksByListResponse: MessageTypeDefinition
   GetTasksRequest: MessageTypeDefinition
   GetTasksResponse: MessageTypeDefinition
   MoveTaskRequest: MessageTypeDefinition

@@ -1,4 +1,4 @@
-// Original file: protos/lists.proto
+// Original file: protos/source/lists.proto
 
 import type * as grpc from '@grpc/grpc-js'
 import type { MethodDefinition } from '@grpc/proto-loader'

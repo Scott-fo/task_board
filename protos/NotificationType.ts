@@ -1,4 +1,4 @@
-// Original file: protos/subscription.proto
+// Original file: protos/source/subscription.proto
 
 export const NotificationType = {
   NOTIFICATION_DEADLINE_PASSED: 'NOTIFICATION_DEADLINE_PASSED',

@@ -1,4 +1,4 @@
-// Original file: protos/lists.proto
+// Original file: protos/source/lists.proto
 
 import type { ListEntry as _ListEntry, ListEntry__Output as _ListEntry__Output } from './ListEntry';
 

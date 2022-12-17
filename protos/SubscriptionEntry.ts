@@ -1,4 +1,4 @@
-// Original file: protos/subscription.proto
+// Original file: protos/source/subscription.proto
 
 
 export interface SubscriptionEntry {

@@ -1,4 +1,4 @@
-// Original file: protos/subscription.proto
+// Original file: protos/source/subscription.proto
 
 import type { SubscriptionEntry as _SubscriptionEntry, SubscriptionEntry__Output as _SubscriptionEntry__Output } from './SubscriptionEntry';
 
