@@ -81,8 +81,9 @@ Supporting packages: Material UI, zod, luxon, axios
 There are no automated tests due to the heavy use of db methods and gRPC client/server calls.
 It is more useful to use a service such as postman to test the API
 
-The API for the gateway can be viewed at localhost:8000/api-docs when the app is started
-The schemas for the gRPC services can be viewed in the protos/source folder
+The API for the gateway can be viewed at localhost:8000/api-docs when the app is started.
+The schemas for the gRPC services can be viewed in the protos/source folder.
+To propagate any changes to the gRPC schemas, run the 3 commands in the Makefile at the root of this project.
 
 ## Shortcomings
 
