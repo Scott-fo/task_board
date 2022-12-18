@@ -1,16 +1,12 @@
 import React, { useEffect } from "react";
-import axios from "axios";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
 import {
   setListView,
   updateLists,
   setActiveList,
-} from "../features/lists/listSlice";
-
-interface ListInterface {
-  id: string;
-  name: string;
-}
+} from "../slices/lists/listSlice";
+import { getLists, updateList } from "../api/ListsApi";
+import { ListInterface } from "../types/listTypes";
 
 const ActiveList = () => {
   const listName = useAppSelector((state) => state.listReducer.name);
@@ -55,17 +51,9 @@ const ActiveList = () => {
     }
   };
 
-  const getLists = async () => {
-    const { data } = await axios.get("http://localhost:8000/lists");
-    return data.lists;
-  };
-
-  const updateList = async (name: string, id: string) => {
+  const handleUpdateList = async (name: string, id: string) => {
     if (name.trim() !== "") {
-      await axios.post("http://localhost:8000/lists/update", {
-        id,
-        name,
-      });
+      await updateList(name, id);
     }
     dispatch(updateLists(await getLists()));
   };
@@ -78,7 +66,7 @@ const ActiveList = () => {
         value={listName}
         onChange={(e) => editList(e.target.value)}
         onKeyDown={onEnter}
-        onBlur={(e) => updateList(e.target.value, listId)}
+        onBlur={(e) => handleUpdateList(e.target.value, listId)}
       />
     </div>
   );

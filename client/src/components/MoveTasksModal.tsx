@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import axios from "axios";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import { useAppSelector } from "../app/hooks";
-import { ListInterface } from "./List";
+import { moveTasks } from "../api/TasksApi";
+import { ListInterface } from "../types/listTypes";
 
 const style = {
   position: "absolute" as "absolute",
@@ -35,10 +35,7 @@ const MoveTaskModal = ({
   const handleClose = () => setOpen(false);
 
   const handleMove = async (id: string) => {
-    await axios.post("http://localhost:8000/tasks/move", {
-      listId: id,
-      tasks: selected,
-    });
+    await moveTasks(id, selected);
     handleClose();
   };
 

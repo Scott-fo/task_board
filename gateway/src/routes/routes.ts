@@ -1,41 +1,30 @@
 import express from "express";
-import { NotifySubscribers } from "../controllers/notification_controller";
-import {
-  createSubscription,
-  getSubscriptions,
-} from "../controllers/subscription_controller";
-import {
-  getTasks,
-  getTasksByList,
-  createTask,
-  deleteTasks,
-  updateTask,
-  moveTasks,
-} from "../controllers/task_controller";
+import swaggerUi from "swagger-ui-express";
+import swaggerJSDoc from "swagger-jsdoc";
+import { taskRouter } from "./tasksRouter";
+import { listRouter } from "./listRouter";
+import { subscriptionRouter } from "./subscriptionRouter";
 
-import {
-  getLists,
-  deleteLists,
-  createLists,
-  updateLists,
-} from "../controllers/list_controller";
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Task Board",
+      version: "1.0.0",
+    },
+  },
+  apis: ["./src/routes/*.ts"],
+};
+
+const swaggerSpec = swaggerJSDoc(options);
 
 const router = express.Router();
 
-router.get("/subscriptions", getSubscriptions);
-router.post("/subscriptions/create", createSubscription);
-router.post("/subscriptions/notification", NotifySubscribers);
+router.use("/api-docs", swaggerUi.serve);
+router.get("/api-docs", swaggerUi.setup(swaggerSpec));
 
-router.get("/tasks", getTasks);
-router.get("/tasks/:id", getTasksByList);
-router.post("/tasks/create", createTask);
-router.post("/tasks/delete", deleteTasks);
-router.post("/tasks/update", updateTask);
-router.post("/tasks/move", moveTasks);
-
-router.get("/lists", getLists);
-router.post("/lists/delete", deleteLists);
-router.post("/lists/create", createLists);
-router.post("/lists/update", updateLists);
+router.use(taskRouter);
+router.use(listRouter);
+router.use(subscriptionRouter);
 
 export { router };

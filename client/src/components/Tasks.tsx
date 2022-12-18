@@ -1,149 +1,74 @@
 import React, { useState, useEffect } from "react";
-import z from "zod";
-import axios from "axios";
 import { useAppSelector } from "../app/hooks";
 import { TaskFooter } from "./TaskFooter";
 import { DateTime } from "luxon";
-
-export interface Task {
-  id: string;
-  name: string;
-  description: string;
-  listId: string;
-  unixTime: string;
-  completed?: boolean;
-}
-
-interface EditingTask extends Task {
-  parsedTime: string;
-}
+import { completeTask, getTasks, updateTask } from "../api/TasksApi";
+import { Task, EditingTask } from "../types/taskTypes";
+import { getParsedTime, validateDateInput } from "../utils/taskUtils";
 
 const Tasks = () => {
-  const [open, setOpen] = React.useState(false);
+  const listId = useAppSelector((state) => state.listReducer.id);
+  const [open, setOpen] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
+  const [error, setError] = useState<string>("");
+  const [editingState, setEditingState] = useState<EditingTask>(
+    {} as EditingTask
+  );
   const [editing, setEditing] = useState<{ id: string; state: boolean }>({
     id: "",
     state: false,
   });
-  const [selected, setSelected] = useState<string[]>([]);
-  const [editingState, setEditingState] = useState<EditingTask>();
 
-  const listId = useAppSelector((state) => state.listReducer.id);
-
-  const getTasks = async () => {
-    const { data } = await axios.get(`http://localhost:8000/tasks/${listId}`);
-    setTasks(data.tasks ?? []);
+  const handleGetTasks = async () => {
+    const tasks = await getTasks(listId);
+    setError("");
+    setTasks(tasks);
   };
 
-  useEffect(() => {
-    if (open !== true) {
-      getTasks();
-      setSelected([]);
+  const handleUpdateTask = async (task: EditingTask) => {
+    const { deadline, error } = validateDateInput(task.parsedTime);
+    if (error !== "") {
+      setError(error);
+    } else {
+      await updateTask(task, deadline);
+      setEditing({ id: task.id, state: false });
+      handleGetTasks();
     }
-  }, [listId, open]);
-
-  const newTask: Partial<Task> = {
-    name: "Untitled Task",
-    description: "description",
-    listId,
-    completed: false,
-    unixTime: "",
   };
 
-  const deleteTasks = async () => {
-    await axios.post("http://localhost:8000/tasks/delete", {
-      tasks: selected,
-    });
-    getTasks();
-    setSelected([]);
-  };
-
-  const createNewTask = async () => {
-    await axios.post("http://localhost:8000/tasks/create", {
-      ...newTask,
-    });
-    getTasks();
+  const handleCompleteTask = async (task: Task) => {
+    await completeTask(task);
+    handleGetTasks();
   };
 
   const toggleTask = (id: string) => {
-    if (selected.includes(id)) {
-      setSelected(selected.filter((entry) => entry !== id));
+    if (selectedTaskIds.includes(id)) {
+      setSelectedTaskIds(selectedTaskIds.filter((entry) => entry !== id));
     } else {
-      setSelected([...selected, id]);
+      setSelectedTaskIds([...selectedTaskIds, id]);
     }
   };
 
   const handleEditing = (task: Task, state: boolean) => {
     setEditing({ id: task.id, state });
-    setSelected(selected.filter((entry) => entry !== task.id));
+    setSelectedTaskIds(selectedTaskIds.filter((entry) => entry !== task.id));
     setEditingState({
       ...task,
       completed: task.completed ?? false,
-      parsedTime:
-        task.unixTime && task.unixTime !== ""
-          ? DateTime.fromSeconds(parseInt(task.unixTime)).toLocaleString()
-          : "",
+      parsedTime: getParsedTime(task.unixTime),
     } as EditingTask);
   };
 
-  const validateDateInput = (): { deadline: string; error: string } => {
-    if (editingState?.parsedTime !== "") {
-      const dateSchema = z.preprocess((arg) => {
-        if (typeof arg == "string" || arg instanceof Date) return new Date(arg);
-      }, z.date());
-
-      const result = dateSchema.safeParse(
-        DateTime.fromFormat(editingState!.parsedTime, "dd/MM/yyyy").toJSDate()
-      );
-      if (result.success === false) {
-        return { deadline: "", error: "Enter valid date" };
-      } else {
-        const deadline = DateTime.fromJSDate(result.data).toSeconds();
-        if (deadline < DateTime.now().toSeconds()) {
-          return { deadline: "", error: "Please enter a date in the future" };
-        } else {
-          return { deadline: deadline.toString(), error: "" };
-        }
-      }
-    } else {
-      return { deadline: "", error: "" };
+  useEffect(() => {
+    if (open !== true) {
+      handleGetTasks();
+      setSelectedTaskIds([]);
     }
-  };
-
-  const updateTask = async (task: Task) => {
-    const { deadline, error } = validateDateInput();
-    if (error !== "") {
-      console.log(error);
-    } else {
-      await axios.post("http://localhost:8000/tasks/update", {
-        ...task,
-        unixTime: deadline,
-      });
-      getTasks();
-      setEditing({ id: task.id, state: false });
-    }
-  };
-
-  const completeTask = async (task: Task) => {
-    const status = !task.completed;
-    await axios.post("http://localhost:8000/tasks/update", {
-      ...task,
-      completed: status,
-    });
-
-    if (status === true) {
-      await axios.post("http://localhost:8000/subscriptions/notification", {
-        type: "NOTIFICATION_TASK_COMPLETED",
-      });
-    }
-    getTasks();
-  };
+  }, [listId, open]);
 
   const parseTasks = (task: Task) => {
-    const parsedTime =
-      task.unixTime && task.unixTime !== ""
-        ? DateTime.fromSeconds(parseInt(task.unixTime)).toLocaleString()
-        : "";
+    const parsedTime = getParsedTime(task.unixTime);
     return (
       <div
         className="flex flex-col border border-black rounded-lg h-auto p-8 m-4"
@@ -192,7 +117,7 @@ const Tasks = () => {
             <div className="flex">
               <button
                 className="pl-8 pr-8 pt-4 pb-4 border border-black rounded-lg hover:bg-red-500 hover:text-white m-2 w-full"
-                onClick={() => updateTask(editingState as Task)}
+                onClick={() => handleUpdateTask(editingState as EditingTask)}
               >
                 SAVE
               </button>
@@ -223,7 +148,7 @@ const Tasks = () => {
                   Edit
                 </button>
                 <button
-                  onClick={() => completeTask(task)}
+                  onClick={() => handleCompleteTask(task)}
                   className="pl-2 text-sm italic hover:underline"
                 >
                   {task.completed ? "Undo Complete" : "Complete"}
@@ -253,14 +178,18 @@ const Tasks = () => {
 
   return (
     <div className="h-[90%] overflow-auto">
+      <div className="p-4 text-red-500">
+        {error !== "" && <span>{error}</span>}
+      </div>
       <div className="">{parsedTasks}</div>
       <div>
         <TaskFooter
-          selected={selected}
+          selectedTaskIds={selectedTaskIds}
+          setSelectedTaskIds={setSelectedTaskIds}
           open={open}
           setOpen={setOpen}
-          createNewTask={createNewTask}
-          deleteTasks={deleteTasks}
+          handleGetTasks={handleGetTasks}
+          setError={setError}
         />
       </div>
     </div>

@@ -1,15 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-interface List {
-  id: string;
-  name: string;
-}
-
-interface ListState {
-  id: string;
-  name: string;
-  lists: List[];
-}
+import { ListInterface, ListState } from "../../types/listTypes";
 
 const initialState: ListState = {
   id: "",
@@ -30,7 +20,7 @@ export const listSlice = createSlice({
     ) => {
       state.lists = action.payload;
     },
-    setActiveList: (state, action: PayloadAction<List>) => {
+    setActiveList: (state, action: PayloadAction<ListInterface>) => {
       state.id = action.payload.id;
       state.name = action.payload.name;
     },

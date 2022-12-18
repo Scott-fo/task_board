@@ -12,9 +12,11 @@ export const getSubscriptions = (_req: Request, res: Response) => {
     (err: Error, response: GetSubscriptionsResponse) => {
       if (err) {
         console.log(err);
-        res.status(400).send("Failed to retrieve subscriptions");
+        res
+          .status(400)
+          .send(`Failed to retrieve subscriptions: ${err.message}`);
       } else {
-        res.send(response);
+        res.status(200).send(response);
       }
     }
   );
@@ -36,9 +38,11 @@ export const createSubscription = (req: Request, res: Response) => {
       result.data as CreateSubscriptionRequest,
       (err: Error, _response: CreateSubscriptionResponse) => {
         if (err) {
-          res.status(400).send("Failed to create subscriptions");
+          res
+            .status(400)
+            .send(`Failed to create subscriptions: ${err.message}`);
         } else {
-          res.send("Successfully created subscription");
+          res.status(201).send("Successfully created subscription");
         }
       }
     );

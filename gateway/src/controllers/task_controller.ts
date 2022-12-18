@@ -22,7 +22,7 @@ export const getTasks = (_req: Request, res: Response) => {
         console.log(err);
         res.status(400).send("Failed to retrieve tasks");
       } else {
-        res.send(response);
+        res.status(200).send(response);
       }
     }
   );
@@ -46,7 +46,7 @@ export const getTasksByList = (req: Request, res: Response) => {
           console.log(err);
           res.status(400).send("Failed to retrieve tasks");
         } else {
-          res.send(response);
+          res.status(200).send(response);
         }
       }
     );
@@ -73,7 +73,7 @@ export const createTask = (req: Request, res: Response) => {
           console.log(err);
           res.status(400).send("Failed to create task");
         } else {
-          res.send(response);
+          res.status(201).send(response);
         }
       }
     );
@@ -93,12 +93,12 @@ export const deleteTasks = (req: Request, res: Response) => {
   } else {
     taskServiceClient.deleteTasks(
       result.data as DeleteTasksRequest,
-      (err: Error, response: DeleteTasksResponse) => {
+      (err: Error, _response: DeleteTasksResponse) => {
         if (err) {
           console.log(err);
           res.status(400).send("Failed to delete task");
         } else {
-          res.send(response);
+          res.status(200).send("Successfully deleted task");
         }
       }
     );
@@ -126,7 +126,7 @@ export const updateTask = (req: Request, res: Response) => {
           console.log(err);
           res.status(400).send("Failed to update task");
         } else {
-          res.send(response);
+          res.status(200).send(response);
         }
       }
     );
@@ -147,12 +147,12 @@ export const moveTasks = (req: Request, res: Response) => {
   } else {
     taskServiceClient.moveTasks(
       result.data as MoveTaskRequest,
-      (err: Error, response: MoveTaskResponse) => {
+      (err: Error, _response: MoveTaskResponse) => {
         if (err) {
           console.log(err);
           res.status(400).send("Failed to move tasks");
         } else {
-          res.send(response);
+          res.status(200).send("Successfully moved tasks");
         }
       }
     );

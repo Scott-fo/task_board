@@ -22,9 +22,9 @@ export const NotifySubscribers = (req: Request, res: Response) => {
       result.data as NotifySubscribersRequest,
       (err: Error, _response: NotifySubscribersResponse) => {
         if (err) {
-          res.status(400).send("Failed to notify subscribers");
+          res.status(400).send(`Failed to notify subscribers: ${err.message}`);
         } else {
-          res.send("Notified subscribers!");
+          res.status(200).send("Notified subscribers!");
         }
       }
     );

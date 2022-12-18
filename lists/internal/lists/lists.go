@@ -56,7 +56,7 @@ func deleteTasksByList(ctx context.Context, in *pb.DeleteTasksByListRequest) {
 	_, err = client.DeleteTasksByList(ctx, in)
 	if err != nil {
 		log.Print(err)
-		log.Println("Failed to delete tasks")
+		log.Printf("Failed to delete tasks for list: %s \n", in.ListId)
 	}
 }
 

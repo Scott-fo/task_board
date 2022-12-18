@@ -10,6 +10,8 @@ export const CreateSubscription = (
   >,
   callback: grpc.sendUnaryData<CreateSubscriptionResponse>
 ) => {
+  console.log("Received CreareSubscription Request");
+
   const user = {
     firstName: call.request.firstName,
     email: call.request.email,
@@ -38,6 +40,8 @@ export const GetSubscriptions = (
   >,
   callback: grpc.sendUnaryData<CreateSubscriptionResponse>
 ) => {
+  console.log("Received GetSubscriptions Request");
+
   pool.getConnection((err, connection) => {
     if (err) {
       callback({ name: err.name, message: err.message }, {});

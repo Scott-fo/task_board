@@ -1,42 +1,36 @@
-import axios from "axios";
 import React, { useEffect } from "react";
+import { createList, deleteList, getLists } from "../api/ListsApi";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
-import { setActiveList, updateLists } from "../features/lists/listSlice";
-
-export interface ListInterface {
-  id: string;
-  name: string;
-}
+import { ListInterface } from "../types/listTypes";
+import { setActiveList, updateLists } from "../slices/lists/listSlice";
 
 const List = () => {
   const lists = useAppSelector((state) => state.listReducer.lists);
   const listId = useAppSelector((state) => state.listReducer.id);
   const dispatch = useAppDispatch();
 
-  const getLists = async () => {
-    const { data } = await axios.get("http://localhost:8000/lists");
-    dispatch(updateLists(data.lists || []));
+  const handleGetLists = async () => {
+    const lists = await getLists();
+    dispatch(updateLists(lists));
   };
 
-  useEffect(() => {
-    getLists();
-  }, []);
-
-  const createList = async () => {
-    await axios.post("http://localhost:8000/lists/create", {
-      name: "Untitled",
-    });
-    getLists();
+  const handleCreateList = async () => {
+    await createList();
+    handleGetLists();
   };
 
-  const deleteList = async (id: string) => {
-    await axios.post("http://localhost:8000/lists/delete", { id });
-    getLists();
+  const handleDeleteList = async (id: string) => {
+    await deleteList(id);
+    handleGetLists();
   };
 
   const updateActiveList = (name: string, id: string) => {
     dispatch(setActiveList({ name, id }));
   };
+
+  useEffect(() => {
+    handleGetLists();
+  }, []);
 
   const parseLists = (list: ListInterface) => {
     return (
@@ -55,7 +49,7 @@ const List = () => {
         <button
           key={list.id}
           className="pr-2 hover:text-red-500 text-xl"
-          onClick={() => deleteList(list.id)}
+          onClick={() => handleDeleteList(list.id)}
         >
           -
         </button>
@@ -69,7 +63,7 @@ const List = () => {
     <div className="h-[96%] border-r-2 w-1/4 overflow-auto">
       <div className="flex justify-between p-4">
         <h1 className="font-bold text-2xl">Lists</h1>
-        <button className="text-2xl" onClick={createList}>
+        <button className="text-2xl" onClick={handleCreateList}>
           +
         </button>
       </div>

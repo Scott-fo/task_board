@@ -4,6 +4,3 @@ CREATE TABLE IF NOT EXISTS subscriptions (
   email VARCHAR(255),
   PRIMARY KEY(id)
 );
-
-INSERT INTO subscriptions (firstName, email)
-VALUES ("Elon", "elon@twitter.com");

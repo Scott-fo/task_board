@@ -11,9 +11,9 @@ export const NotifySubscribers = (
   >,
   callback: grpc.sendUnaryData<NotifySubscribersResponse>
 ) => {
-  console.log("Received NotifySubscribers request");
-  const type = call.request.type as NotificationType;
+  console.log("Received NotifySubscribers Request");
 
+  const type = call.request.type as NotificationType;
   pool.getConnection((err, connection) => {
     if (err) {
       callback({ name: err.name, message: err.message }, {});

@@ -18,7 +18,7 @@ export const getLists = (_req: Request, res: Response) => {
         console.log(err);
         res.status(400).send("Failed to retrieve lists");
       } else {
-        res.send(response);
+        res.status(200).send(response);
       }
     }
   );
@@ -37,12 +37,12 @@ export const deleteLists = (req: Request, res: Response) => {
   } else {
     listServiceClient.deleteList(
       result.data as DeleteListRequest,
-      (err: Error, response: DeleteListResponse) => {
+      (err: Error, _response: DeleteListResponse) => {
         if (err) {
           console.log(err);
           res.status(400).send("Failed to delete list");
         } else {
-          res.send(response);
+          res.status(200).send("Successfully deleted list");
         }
       }
     );
@@ -62,12 +62,12 @@ export const createLists = (req: Request, res: Response) => {
   } else {
     listServiceClient.createList(
       result.data as CreateListRequest,
-      (err: Error, response: CreateListResponse) => {
+      (err: Error, _response: CreateListResponse) => {
         if (err) {
           console.log(err);
           res.status(400).send("Failed to create list");
         } else {
-          res.send(response);
+          res.status(201).send("Successfully created list");
         }
       }
     );
@@ -93,7 +93,7 @@ export const updateLists = (req: Request, res: Response) => {
           console.log(err);
           res.status(400).send("Failed to update list");
         } else {
-          res.send(response);
+          res.status(200).send(response);
         }
       }
     );

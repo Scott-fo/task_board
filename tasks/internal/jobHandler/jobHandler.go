@@ -16,7 +16,6 @@ import (
 )
 
 func Start() {
-	fmt.Println("Entered job main")
 	c := cron.New()
 	c.AddFunc("@daily", notifyExpiredTasks)
 	c.Start()
@@ -54,7 +53,15 @@ func notifyExpiredTasks() {
 		return
 	}
 
-	var filteredResults []TaskId
+	conn, err := grpc.Dial("dns:///task_board_emails_1:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	defer conn.Close()
+	emailClient := pb.NewEmailServiceClient(conn)
+
 	for _, task := range results {
 		if task.UnixTime != "" {
 			deadline, err := strconv.ParseInt(task.UnixTime, 10, 64)
@@ -65,26 +72,11 @@ func notifyExpiredTasks() {
 			}
 
 			if deadline < time.Now().Unix() && task.Completed == false {
-				filteredResults = append(filteredResults, task)
+				// Can add more details about the task easily, just left it as basic type for proof of concept
+				emailClient.NotifySubscribers(context.TODO(), &pb.NotifySubscribersRequest{
+					Type: pb.NotificationType_NOTIFICATION_DEADLINE_PASSED,
+				})
 			}
 		}
 	}
-
-	if len(filteredResults) > 0 {
-		conn, err := grpc.Dial("dns:///task_board_emails_1:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
-		if err != nil {
-			log.Println(err)
-			return
-		}
-
-		defer conn.Close()
-		emailClient := pb.NewEmailServiceClient(conn)
-
-		for range filteredResults {
-			emailClient.NotifySubscribers(context.TODO(), &pb.NotifySubscribersRequest{
-				Type: pb.NotificationType_NOTIFICATION_DEADLINE_PASSED,
-			})
-		}
-	}
-
 }
